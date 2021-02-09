@@ -1,0 +1,59 @@
+use crate::{config::DatabaseConfig, DatabasePool};
+use logger::error;
+
+pub struct Database {
+    pub database_type: DatabaseType,
+    pub ip: String,
+    pub port: i32,
+    pub db_name: String,
+}
+
+#[derive(Debug, Clone)]
+pub enum DatabaseType {
+    Sqlite,
+    Mariadb,
+    Postgresql,
+}
+
+impl Database {
+    pub fn new() -> Self {
+        Self {
+            database_type: DatabaseType::Mariadb,
+            ip: String::new(),
+            port: 12560,
+            db_name: String::new(),
+        }
+    }
+    pub fn from(ip: String, port: i32, database_type: DatabaseType, db_name: String) -> Self {
+        Self {
+            database_type,
+            ip,
+            port,
+            db_name,
+        }
+    }
+    pub async fn get_conn_from_config(config: DatabaseConfig) -> DatabasePool {
+        match config.database_type {
+            DatabaseType::Sqlite => {
+                let e = match sqlx::SqlitePool::connect(config.sqlite_format().as_str()).await {
+                    Ok(e) => e,
+                    Err(e) => {
+                        error(format!("Error : {}", e.as_database_error().unwrap()));
+                        panic!()
+                    }
+                };
+                DatabasePool::Sqlite(e)
+            }
+            DatabaseType::Mariadb => DatabasePool::Mariadb(
+                sqlx::MySqlPool::connect(config.mariadb_format().as_str())
+                    .await
+                    .unwrap(),
+            ),
+            DatabaseType::Postgresql => DatabasePool::Postgre(
+                sqlx::PgPool::connect(config.postgres_format().as_str())
+                    .await
+                    .unwrap(),
+            ),
+        }
+    }
+}

@@ -1,5 +1,6 @@
-use crate::{DatabaseType, DatabasePool, Database};
-
+use crate::database::Database;
+use crate::database::DatabaseType;
+use crate::DatabasePool;
 #[derive(Debug, Clone)]
 pub struct DatabaseConfig {
     pub database_type: DatabaseType,
@@ -20,19 +21,13 @@ impl DatabaseConfig {
         }
     }
     pub fn mariadb_format(&self) -> String {
-        format!(
-            "mysql://{}:{}@{}",
-            self.user, self.password, self.ip
-        )
+        format!("mysql://{}:{}@{}", self.user, self.password, self.ip)
     }
     pub fn sqlite_format(&self) -> String {
         format!("./{}", self.ip)
     }
     pub fn postgres_format(&self) -> String {
-        format!(
-            "postgres://{}:{}@{}",
-            self.user, self.password, self.ip
-        )
+        format!("postgres://{}:{}@{}", self.user, self.password, self.ip)
     }
     pub async fn to_datapool(&self) -> DatabasePool {
         let e = self.clone();
