@@ -1,0 +1,7 @@
+/target
+Cargo.lock
+.idea/
+db.sql-wal
+datagno.iml
+db.sql
+db.sql-shm
