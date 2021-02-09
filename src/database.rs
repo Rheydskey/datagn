@@ -15,15 +15,13 @@ pub enum DatabaseType {
     Postgresql,
 }
 
-impl Database {
-    pub fn new() -> Self {
-        Self {
-            database_type: DatabaseType::Mariadb,
-            ip: String::new(),
-            port: 12560,
-            db_name: String::new(),
-        }
+impl Default for DatabaseType {
+    fn default() -> Self {
+        Self::Mariadb
     }
+}
+
+impl Database {
     pub fn from(ip: String, port: i32, database_type: DatabaseType, db_name: String) -> Self {
         Self {
             database_type,
