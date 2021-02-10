@@ -6,7 +6,7 @@ pub fn test() {
 
     async_std::task::block_on(async {
         let mut e = DatabaseConfig {
-            database_type: DatabaseType::Mariadb,
+            database_type: DatabaseType::Mysql,
             ip: String::from("127.0.0.1"),
             port: String::from("3306"),
             user: String::from("root"),

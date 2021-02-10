@@ -15,7 +15,7 @@ use std::fmt::Display;
 #[derive(Clone, Debug)]
 pub enum DatabasePool {
     Sqlite(Pool<Sqlite>),
-    Mariadb(Pool<MySql>),
+    Mysql(Pool<MySql>),
     Postgre(Pool<Postgres>),
 }
 
@@ -82,7 +82,7 @@ impl DatabasePool {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
-            DatabasePool::Mariadb(e) => match e.execute(query).await {
+            DatabasePool::Mysql(e) => match e.execute(query).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
@@ -111,7 +111,7 @@ impl DatabasePool {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
-            DatabasePool::Mariadb(e) => match e.execute(replaced_query.as_str()).await {
+            DatabasePool::Mysql(e) => match e.execute(replaced_query.as_str()).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
@@ -127,7 +127,7 @@ impl DatabasePool {
                 Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
-            DatabasePool::Mariadb(e) => match e.fetch_all(query).await {
+            DatabasePool::Mysql(e) => match e.fetch_all(query).await {
                 Ok(maria_rows) => Ok(maria_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
@@ -156,7 +156,7 @@ impl DatabasePool {
                 Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
-            DatabasePool::Mariadb(e) => match e.fetch_all(replaced_query.as_str()).await {
+            DatabasePool::Mysql(e) => match e.fetch_all(replaced_query.as_str()).await {
                 Ok(maria_rows) => Ok(maria_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
@@ -177,7 +177,7 @@ impl DatabasePool {
                 }
                 Ok(())
             }
-            DatabasePool::Mariadb(e) => {
+            DatabasePool::Mysql(e) => {
                 for i in query {
                     match e.execute(i).await {
                         Ok(_) => {}

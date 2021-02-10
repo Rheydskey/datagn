@@ -11,13 +11,13 @@ pub struct Database {
 #[derive(Debug, Clone)]
 pub enum DatabaseType {
     Sqlite,
-    Mariadb,
+    Mysql,
     Postgresql,
 }
 
 impl Default for DatabaseType {
     fn default() -> Self {
-        Self::Mariadb
+        Self::Mysql
     }
 }
 
@@ -42,8 +42,8 @@ impl Database {
                 };
                 DatabasePool::Sqlite(e)
             }
-            DatabaseType::Mariadb => DatabasePool::Mariadb(
-                sqlx::MySqlPool::connect(config.mariadb_format().as_str())
+            DatabaseType::Mysql => DatabasePool::Mysql(
+                sqlx::MySqlPool::connect(config.mysql_format().as_str())
                     .await
                     .unwrap(),
             ),

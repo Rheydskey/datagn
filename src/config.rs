@@ -20,7 +20,7 @@ impl DatabaseConfig {
             password: String::from("PASSWORD HERE"),
         }
     }
-    pub fn mariadb_format(&self) -> String {
+    pub fn mysql_format(&self) -> String {
         format!("mysql://{}:{}@{}", self.user, self.password, self.ip)
     }
     pub fn sqlite_format(&self) -> String {
