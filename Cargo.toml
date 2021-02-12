@@ -1,5 +1,5 @@
 [package]
-name = "datagno"
+name = "datagn"
 version = "0.1.0"
 authors = ["Rheydskey <matgag02@gmail.com>"]
 edition = "2018"
