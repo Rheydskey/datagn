@@ -8,7 +8,7 @@ pub struct Database {
     pub db_name: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Derive)]
 pub enum DatabaseType {
     Sqlite,
     Mysql,
