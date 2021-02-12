@@ -1,5 +1,6 @@
 use crate::{config::DatabaseConfig, DatabasePool};
 use logger::error;
+use serde::{Deserialize, Serialize};
 
 pub struct Database {
     pub database_type: DatabaseType,
@@ -8,7 +9,7 @@ pub struct Database {
     pub db_name: String,
 }
 
-#[derive(Debug, Clone, Derive)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum DatabaseType {
     Sqlite,
     Mysql,
