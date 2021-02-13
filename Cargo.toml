@@ -15,6 +15,8 @@ runtime-async-std-rustls = ["sqlx/runtime-async-std-rustls"]
 runtime-tokio-rustls = ["sqlx/runtime-tokio-rustls"]
 
 [dependencies]
+# Fix Bitvecs bug
+funty="=1.1.0"
 sqlx = { version = "0.5.1", features = ["all"] }
 async-std = "1.9.0"
 logger = {git = "https://github.com/Rheydskey/logger.git", branch = "master"}
