@@ -141,7 +141,7 @@ impl DatabasePool {
         &mut self,
         query: &str,
         bind: &[A],
-    ) -> Result<Vec<AnyRow>, String> {
+    ) -> Result<AnyRow, String> {
         let mut replaced_query = query.to_string();
         let mut n = 1;
         for tobind in bind {
@@ -153,15 +153,15 @@ impl DatabasePool {
         }
         match self {
             DatabasePool::Sqlite(e) => match e.fetch_one(replaced_query.as_str()).await {
-                Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrows()),
+                Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
             DatabasePool::Mysql(e) => match e.fetch_one(replaced_query.as_str()).await {
-                Ok(maria_rows) => Ok(maria_rows.to_anyrows()),
+                Ok(maria_rows) => Ok(maria_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
             DatabasePool::Postgre(e) => match e.fetch_one(replaced_query.as_str()).await {
-                Ok(pg_rows) => Ok(pg_rows.to_anyrows()),
+                Ok(pg_rows) => Ok(pg_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
         }
