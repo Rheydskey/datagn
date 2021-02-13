@@ -121,6 +121,51 @@ impl DatabasePool {
             },
         }
     }
+    pub async fn execute_and_fetch_one(&mut self, query: &str) -> Result<AnyRow, String> {
+        match self {
+            DatabasePool::Sqlite(e) => match e.fetch_one(query).await {
+                Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrow()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+            DatabasePool::Mysql(e) => match e.fetch_one(query).await {
+                Ok(maria_rows) => Ok(maria_rows.to_anyrow()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+            DatabasePool::Postgre(e) => match e.fetch_one(query).await {
+                Ok(pg_rows) => Ok(pg_rows.to_anyrow()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+        }
+    }
+    pub async fn execute_and_fetch_one_with_bind<A: Display>(
+        &mut self,
+        query: &str,
+        bind: &[A],
+    ) -> Result<Vec<AnyRow>, String> {
+        let mut replaced_query = query.to_string();
+        let mut n = 1;
+        for tobind in bind {
+            replaced_query = replaced_query.replace(
+                format!("?{}", n).as_str(),
+                format!("'{}'", sqlstrip(tobind.to_string())).as_str(),
+            );
+            n += 1;
+        }
+        match self {
+            DatabasePool::Sqlite(e) => match e.fetch_one(replaced_query.as_str()).await {
+                Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrows()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+            DatabasePool::Mysql(e) => match e.fetch_one(replaced_query.as_str()).await {
+                Ok(maria_rows) => Ok(maria_rows.to_anyrows()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+            DatabasePool::Postgre(e) => match e.fetch_one(replaced_query.as_str()).await {
+                Ok(pg_rows) => Ok(pg_rows.to_anyrows()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+        }
+    }
     pub async fn execute_and_fetch_all(&mut self, query: &str) -> Result<Vec<AnyRow>, String> {
         match self {
             DatabasePool::Sqlite(e) => match e.fetch_all(query).await {
