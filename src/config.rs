@@ -12,20 +12,31 @@ pub struct DatabaseConfig {
 
 impl DatabaseConfig {
     pub fn new() -> Self {
+        let database_type = match () {
+            #[cfg(feature = "sqlite")]
+            () => DatabaseType::Sqlite,
+            #[cfg(feature = "mysql")]
+            () => DatabaseType::Mysql,
+            #[cfg(feature = "postgres")]
+            () => DatabaseType::Postgresql,
+        };
         DatabaseConfig {
-            database_type: DatabaseType::Sqlite,
+            database_type,
             ip: String::from("127.0.0.1"),
             port: String::from("55555"),
             user: String::from("root"),
             password: String::from("PASSWORD HERE"),
         }
     }
+    #[cfg(feature = "mysql")]
     pub fn mysql_format(&self) -> String {
         format!("mysql://{}:{}@{}", self.user, self.password, self.ip)
     }
+    #[cfg(feature = "sqlite")]
     pub fn sqlite_format(&self) -> String {
         format!("./{}", self.ip)
     }
+    #[cfg(feature = "postgres")]
     pub fn postgres_format(&self) -> String {
         format!("postgres://{}:{}@{}", self.user, self.password, self.ip)
     }

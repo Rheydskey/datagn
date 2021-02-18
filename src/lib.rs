@@ -9,10 +9,10 @@ use sqlx::{any::AnyRow, mysql::MySqlRow, postgres::PgRow, sqlite::SqliteRow, Exe
 
 #[cfg(feature = "mysql")]
 use sqlx::MySql;
-#[cfg(feature = "sqlite")]
-use sqlx::Sqlite;
 #[cfg(feature = "postgres")]
 use sqlx::Postgres;
+#[cfg(feature = "sqlite")]
+use sqlx::Sqlite;
 
 use std::fmt::Display;
 
