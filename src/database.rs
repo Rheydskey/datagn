@@ -2,6 +2,9 @@ use crate::{config::DatabaseConfig, DatabasePool};
 use logger::error;
 use serde::{Deserialize, Serialize};
 
+#[cfg(not(any(feature = "sqlite", feature = "mysql", feature = "postgres",)))]
+compile_error!("one of the features ['sqlite', 'mysql', 'postgres'] must be enabled");
+
 pub struct Database {
     pub database_type: DatabaseType,
     pub ip: String,
@@ -11,14 +14,24 @@ pub struct Database {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum DatabaseType {
+    #[cfg(feature = "sqlite")]
     Sqlite,
+    #[cfg(feature = "mysql")]
     Mysql,
+    #[cfg(feature = "postgres")]
     Postgresql,
 }
 
 impl Default for DatabaseType {
     fn default() -> Self {
-        Self::Mysql
+        match () {
+            #[cfg(feature = "sqlite")]
+            () => DatabaseType::Sqlite,
+            #[cfg(feature = "postgres")]
+            () => DatabaseType::Postgresql,
+            #[cfg(feature = "mysql")]
+            () => DatabaseType::Mysql,
+        }
     }
 }
 
@@ -33,6 +46,7 @@ impl Database {
     }
     pub async fn get_conn_from_config(config: DatabaseConfig) -> DatabasePool {
         match config.database_type {
+            #[cfg(feature = "sqlite")]
             DatabaseType::Sqlite => {
                 let e = match sqlx::SqlitePool::connect(config.sqlite_format().as_str()).await {
                     Ok(e) => e,
@@ -43,11 +57,13 @@ impl Database {
                 };
                 DatabasePool::Sqlite(e)
             }
+            #[cfg(feature = "mysql")]
             DatabaseType::Mysql => DatabasePool::Mysql(
                 sqlx::MySqlPool::connect(config.mysql_format().as_str())
                     .await
                     .unwrap(),
             ),
+            #[cfg(feature = "postgres")]
             DatabaseType::Postgresql => DatabasePool::Postgre(
                 sqlx::PgPool::connect(config.postgres_format().as_str())
                     .await

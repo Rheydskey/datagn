@@ -5,17 +5,24 @@ pub mod utils;
 
 use crate::utils::sqlstrip;
 
-use sqlx::{
-    any::AnyRow, mysql::MySqlRow, postgres::PgRow, sqlite::SqliteRow, Executor, MySql, Pool,
-    Postgres, Sqlite,
-};
+use sqlx::{any::AnyRow, mysql::MySqlRow, postgres::PgRow, sqlite::SqliteRow, Executor, Pool};
+
+#[cfg(feature = "mysql")]
+use sqlx::MySql;
+#[cfg(feature = "sqlite")]
+use sqlx::Sqlite;
+#[cfg(feature = "postgres")]
+use sqlx::Postgres;
 
 use std::fmt::Display;
 
 #[derive(Clone, Debug)]
 pub enum DatabasePool {
+    #[cfg(feature = "sqlite")]
     Sqlite(Pool<Sqlite>),
+    #[cfg(feature = "mysql")]
     Mysql(Pool<MySql>),
+    #[cfg(feature = "postgres")]
     Postgre(Pool<Postgres>),
 }
 
@@ -78,14 +85,17 @@ impl ToAnyRow for SqliteRow {
 impl DatabasePool {
     pub async fn execute(&mut self, query: &str) -> Result<(), String> {
         match self {
+            #[cfg(feature = "sqlite")]
             DatabasePool::Sqlite(e) => match e.execute(query).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mysql")]
             DatabasePool::Mysql(e) => match e.execute(query).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.execute(query).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
@@ -107,14 +117,17 @@ impl DatabasePool {
             n += 1;
         }
         match self {
+            #[cfg(feature = "sqlite")]
             DatabasePool::Sqlite(e) => match e.execute(replaced_query.as_str()).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mysql")]
             DatabasePool::Mysql(e) => match e.execute(replaced_query.as_str()).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.execute(replaced_query.as_str()).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
@@ -123,14 +136,17 @@ impl DatabasePool {
     }
     pub async fn execute_and_fetch_one(&mut self, query: &str) -> Result<AnyRow, String> {
         match self {
+            #[cfg(feature = "sqlite")]
             DatabasePool::Sqlite(e) => match e.fetch_one(query).await {
                 Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mysql")]
             DatabasePool::Mysql(e) => match e.fetch_one(query).await {
                 Ok(maria_rows) => Ok(maria_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.fetch_one(query).await {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
@@ -152,14 +168,17 @@ impl DatabasePool {
             n += 1;
         }
         match self {
+            #[cfg(feature = "sqlite")]
             DatabasePool::Sqlite(e) => match e.fetch_one(replaced_query.as_str()).await {
                 Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mysql")]
             DatabasePool::Mysql(e) => match e.fetch_one(replaced_query.as_str()).await {
                 Ok(maria_rows) => Ok(maria_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.fetch_one(replaced_query.as_str()).await {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
@@ -168,14 +187,17 @@ impl DatabasePool {
     }
     pub async fn execute_and_fetch_all(&mut self, query: &str) -> Result<Vec<AnyRow>, String> {
         match self {
+            #[cfg(feature = "sqlite")]
             DatabasePool::Sqlite(e) => match e.fetch_all(query).await {
                 Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mysql")]
             DatabasePool::Mysql(e) => match e.fetch_all(query).await {
                 Ok(maria_rows) => Ok(maria_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.fetch_all(query).await {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
@@ -197,14 +219,17 @@ impl DatabasePool {
             n += 1;
         }
         match self {
+            #[cfg(feature = "sqlite")]
             DatabasePool::Sqlite(e) => match e.fetch_all(replaced_query.as_str()).await {
                 Ok(sqlite_rows) => Ok(sqlite_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mysql")]
             DatabasePool::Mysql(e) => match e.fetch_all(replaced_query.as_str()).await {
                 Ok(maria_rows) => Ok(maria_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.fetch_all(replaced_query.as_str()).await {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
@@ -213,6 +238,7 @@ impl DatabasePool {
     }
     pub async fn executes(&mut self, query: Vec<&str>) -> Result<(), String> {
         match self {
+            #[cfg(feature = "sqlite")]
             DatabasePool::Sqlite(e) => {
                 for i in query {
                     match e.execute(i).await {
@@ -222,6 +248,7 @@ impl DatabasePool {
                 }
                 Ok(())
             }
+            #[cfg(feature = "mysql")]
             DatabasePool::Mysql(e) => {
                 for i in query {
                     match e.execute(i).await {
@@ -231,6 +258,7 @@ impl DatabasePool {
                 }
                 Ok(())
             }
+            #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => {
                 for i in query {
                     match e.execute(i).await {

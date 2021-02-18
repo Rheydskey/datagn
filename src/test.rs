@@ -1,5 +1,3 @@
-use logger::info;
-
 #[test]
 pub fn test() {
     use crate::config::DatabaseConfig;
@@ -18,19 +16,26 @@ pub fn test() {
         .to_datapool()
         .await;
 
-        match e.execute("CREATE TABLE IF NOT EXISTS User (
+        match e
+            .execute(
+                "CREATE TABLE IF NOT EXISTS User (
             name TEXT NOT NULL,
             password TEXT NOT NULL
-        );").await {
+        );",
+            )
+            .await
+        {
             Ok(_) => info("Working"),
             Err(e) => error(e),
         };
-        e.execute("INSERT INTO User(name, password) VALUES('Datagn','Password')").await.expect("Error");
+        e.execute("INSERT INTO User(name, password) VALUES('Datagn','Password')")
+            .await
+            .expect("Error");
         match e.execute_and_fetch_one("SELECT * FROM User").await {
             Ok(result) => {
-                let name : String = result.try_get("name").expect("Error");
+                let name: String = result.try_get("name").expect("Error");
                 println!("{}", name);
-            },
+            }
             Err(e) => error(e),
         };
     });
