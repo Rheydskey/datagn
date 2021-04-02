@@ -13,6 +13,8 @@ postgres = []
 sqlite = []
 mssql = []
 
+config_serde = []
+
 runtime-actix-native-tls = ["sqlx/runtime-actix-native-tls"]
 runtime-async-std-native-tls = ["sqlx/runtime-async-std-native-tls"]
 runtime-tokio-native-tls = ["sqlx/runtime-tokio-native-tls"]

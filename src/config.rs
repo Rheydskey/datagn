@@ -1,6 +1,8 @@
 use crate::database::Database;
 use crate::database::DatabaseType;
 use crate::DatabasePool;
+
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Default, Clone)]
 pub struct DatabaseConfig {
     pub database_type: DatabaseType,
