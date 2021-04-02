@@ -11,6 +11,7 @@ pub struct DatabaseConfig {
     pub port: String,
     pub user: String,
     pub password: String,
+    pub database: Option<String>
 }
 
 impl DatabaseConfig {
@@ -31,11 +32,12 @@ impl DatabaseConfig {
             port: String::from("55555"),
             user: String::from("root"),
             password: String::from("PASSWORD HERE"),
+            database: None
         }
     }
     #[cfg(feature = "mysql")]
     pub fn mysql_format(&self) -> String {
-        format!("mysql://{}:{}@{}", self.user, self.password, self.ip)
+        format!("mysql://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.unwrap())
     }
     #[cfg(feature = "sqlite")]
     pub fn sqlite_format(&self) -> String {
@@ -43,11 +45,11 @@ impl DatabaseConfig {
     }
     #[cfg(feature = "postgres")]
     pub fn postgres_format(&self) -> String {
-        format!("postgres://{}:{}@{}", self.user, self.password, self.ip)
+        format!("postgres://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.unwrap())
     }
     #[cfg(feature = "mssql")]
     pub fn mssql_format(&self) -> String {
-        format!("mssql://{}:{}@{}", self.user, self.password, self.ip)
+        format!("mssql://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.unwrap())
     }
     pub async fn to_datapool(&self) -> DatabasePool {
         let e = self.clone();
