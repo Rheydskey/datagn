@@ -20,6 +20,8 @@ pub enum DatabaseType {
     Mysql,
     #[cfg(feature = "postgres")]
     Postgresql,
+    #[cfg(feature = "mssql")]
+    Mssql,
 }
 
 impl Default for DatabaseType {
@@ -31,6 +33,8 @@ impl Default for DatabaseType {
             () => DatabaseType::Postgresql,
             #[cfg(feature = "mysql")]
             () => DatabaseType::Mysql,
+            #[cfg(feature = "mssql")]
+            () => DatabaseType::Mssql,
         }
     }
 }
@@ -66,6 +70,12 @@ impl Database {
             #[cfg(feature = "postgres")]
             DatabaseType::Postgresql => DatabasePool::Postgre(
                 sqlx::PgPool::connect(config.postgres_format().as_str())
+                    .await
+                    .unwrap(),
+            ),
+            #[cfg(feature = "mssql")]
+            DatabaseType::Mssql => DatabasePool::Mssql(
+                sqlx::Mssql::connect(config.mssql_format().as_str())
                     .await
                     .unwrap(),
             ),

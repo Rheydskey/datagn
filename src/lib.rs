@@ -13,8 +13,12 @@ use sqlx::MySql;
 use sqlx::Postgres;
 #[cfg(feature = "sqlite")]
 use sqlx::Sqlite;
+#[cfg(feature = "mssql")]
+use sqlx::Mssql;
+
 
 use std::fmt::Display;
+use sqlx::mssql::MssqlRow;
 
 #[derive(Clone, Debug)]
 pub enum DatabasePool {
@@ -24,6 +28,8 @@ pub enum DatabasePool {
     Mysql(Pool<MySql>),
     #[cfg(feature = "postgres")]
     Postgre(Pool<Postgres>),
+    #[cfg(feature = "mssql")]
+    Mssql(Pool<Mssql>)
 }
 
 trait ToAnyRows {
@@ -60,6 +66,16 @@ impl ToAnyRows for Vec<SqliteRow> {
     }
 }
 
+impl ToAnyRows for Vec<MssqlRow> {
+    fn to_anyrows(self) -> Vec<AnyRow> {
+        let mut result = Vec::new();
+        for i in self {
+            result.push(AnyRow::from(i));
+        }
+        result
+    }
+}
+
 trait ToAnyRow {
     fn to_anyrow(self) -> AnyRow;
 }
@@ -82,6 +98,12 @@ impl ToAnyRow for SqliteRow {
     }
 }
 
+impl ToAnyRow for MssqlRow {
+    fn to_anyrow(self) -> AnyRow {
+        AnyRow::from(self)
+    }
+}
+
 impl DatabasePool {
     pub async fn execute(&mut self, query: &str) -> Result<(), String> {
         match self {
@@ -97,6 +119,11 @@ impl DatabasePool {
             },
             #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.execute(query).await {
+                Ok(_) => Ok(()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+            #[cfg(feature = "mssql")]
+            DatabasePool::Mssql(e) => match e.execute(query).await {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
@@ -132,6 +159,11 @@ impl DatabasePool {
                 Ok(_) => Ok(()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mssql")]
+            DatabasePool::Mssql(e) => match e.execute(replaced_query.as_str()).await {
+                Ok(_) => Ok(()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
         }
     }
     pub async fn execute_and_fetch_one(&mut self, query: &str) -> Result<AnyRow, String> {
@@ -149,6 +181,11 @@ impl DatabasePool {
             #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.fetch_one(query).await {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrow()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+            #[cfg(feature = "mssql")]
+            DatabasePool::Mssql(e) => match e.fetch_one(query).await {
+                Ok(ms_rows) => Ok(ms_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
         }
@@ -183,6 +220,11 @@ impl DatabasePool {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrow()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mssql")]
+            DatabasePool::Mssql(e) => match e.fetch_one(replaced_query.as_str()).await {
+                Ok(ms_rows) => Ok(ms_rows.to_anyrow()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
         }
     }
     pub async fn execute_and_fetch_all(&mut self, query: &str) -> Result<Vec<AnyRow>, String> {
@@ -200,6 +242,11 @@ impl DatabasePool {
             #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => match e.fetch_all(query).await {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrows()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
+            #[cfg(feature = "mssql")]
+            DatabasePool::Mssql(e) => match e.fetch_all(query).await {
+                Ok(ms_rows) => Ok(ms_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
         }
@@ -234,6 +281,11 @@ impl DatabasePool {
                 Ok(pg_rows) => Ok(pg_rows.to_anyrows()),
                 Err(e) => Err(format!("{:?}", e)),
             },
+            #[cfg(feature = "mssql")]
+            DatabasePool::Mssql(e) => match e.fetch_all(replaced_query.as_str()).await {
+                Ok(ms_row) => Ok(ms_row.to_anyrows()),
+                Err(e) => Err(format!("{:?}", e)),
+            },
         }
     }
     pub async fn executes(&mut self, query: Vec<&str>) -> Result<(), String> {
@@ -260,6 +312,16 @@ impl DatabasePool {
             }
             #[cfg(feature = "postgres")]
             DatabasePool::Postgre(e) => {
+                for i in query {
+                    match e.execute(i).await {
+                        Ok(_) => {}
+                        Err(e) => return Err(format!("{:?}", e)),
+                    }
+                }
+                Ok(())
+            }
+            #[cfg(feature = "mssql")]
+            DatabasePool::Mssql(e) => {
                 for i in query {
                     match e.execute(i).await {
                         Ok(_) => {}

@@ -11,7 +11,7 @@ pub fn test() {
             ip: String::from("./db.sql"),
             port: String::from("3306"),
             user: String::from("root"),
-            password: String::from("Rheydskey123!"),
+            password: String::from("root"),
         }
         .to_datapool()
         .await;

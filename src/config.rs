@@ -19,6 +19,8 @@ impl DatabaseConfig {
             () => DatabaseType::Mysql,
             #[cfg(feature = "postgres")]
             () => DatabaseType::Postgresql,
+            #[cfg(feature = "mssql")]
+            () => DatabaseType::Mssql,
         };
         DatabaseConfig {
             database_type,
@@ -39,6 +41,10 @@ impl DatabaseConfig {
     #[cfg(feature = "postgres")]
     pub fn postgres_format(&self) -> String {
         format!("postgres://{}:{}@{}", self.user, self.password, self.ip)
+    }
+    #[cfg(feature = "mssql")]
+    pub fn mssql_format(&self) -> String {
+        format!("mssql://{}:{}@{}", self.user, self.password, self.ip)
     }
     pub async fn to_datapool(&self) -> DatabasePool {
         let e = self.clone();
