@@ -1,6 +1,7 @@
 use crate::database::Database;
 use crate::database::DatabaseType;
 use crate::DatabasePool;
+use serde::{Deserialize, Serialize};
 
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Default, Clone)]
