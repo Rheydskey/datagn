@@ -37,7 +37,7 @@ impl DatabaseConfig {
     }
     #[cfg(feature = "mysql")]
     pub fn mysql_format(&self) -> String {
-        format!("mysql://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.unwrap())
+        format!("mysql://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.clone().unwrap())
     }
     #[cfg(feature = "sqlite")]
     pub fn sqlite_format(&self) -> String {
@@ -45,11 +45,11 @@ impl DatabaseConfig {
     }
     #[cfg(feature = "postgres")]
     pub fn postgres_format(&self) -> String {
-        format!("postgres://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.unwrap())
+        format!("postgres://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.clone().unwrap())
     }
     #[cfg(feature = "mssql")]
     pub fn mssql_format(&self) -> String {
-        format!("mssql://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.unwrap())
+        format!("mssql://{}:{}@{}/{}", self.user, self.password, self.ip, self.database.clone().unwrap())
     }
     pub async fn to_datapool(&self) -> DatabasePool {
         let e = self.clone();
