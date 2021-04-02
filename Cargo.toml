@@ -11,6 +11,7 @@ edition = "2018"
 mysql = []
 postgres = []
 sqlite = []
+mssql = []
 
 runtime-actix-native-tls = ["sqlx/runtime-actix-native-tls"]
 runtime-async-std-native-tls = ["sqlx/runtime-async-std-native-tls"]
