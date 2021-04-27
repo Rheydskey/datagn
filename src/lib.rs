@@ -1,3 +1,6 @@
+#[cfg(not(any(feature = "sqlite", feature = "mysql", feature = "postgres",)))]
+compile_error!("one of the features ['sqlite', 'mysql', 'postgres'] must be enabled");
+
 pub mod config;
 pub mod database;
 pub mod test;

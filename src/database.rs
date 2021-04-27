@@ -2,9 +2,6 @@ use crate::{config::DatabaseConfig, DatabasePool};
 use logger::error;
 use serde::{Deserialize, Serialize};
 
-#[cfg(not(any(feature = "sqlite", feature = "mysql", feature = "postgres",)))]
-compile_error!("one of the features ['sqlite', 'mysql', 'postgres'] must be enabled");
-
 pub struct Database {
     pub database_type: DatabaseType,
     pub ip: String,
