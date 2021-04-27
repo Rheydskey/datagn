@@ -1,5 +1,7 @@
 use crate::{config::DatabaseConfig, DatabasePool};
 use logger::error;
+
+#[cfg(config_serde)]
 use serde::{Deserialize, Serialize};
 
 pub struct Database {
@@ -9,7 +11,8 @@ pub struct Database {
     pub db_name: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone)]
 pub enum DatabaseType {
     #[cfg(feature = "sqlite")]
     Sqlite,
