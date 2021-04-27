@@ -12,6 +12,7 @@ pub fn test() {
             port: String::from("3306"),
             user: String::from("root"),
             password: String::from("root"),
+            database: None,
         }
         .to_datapool()
         .await;
