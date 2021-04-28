@@ -1,7 +1,8 @@
 use crate::{config::DatabaseConfig, DatabasePool};
 use logger::error;
 
-#[cfg(config_serde)]
+
+#[cfg(feature = "config_serde")]
 use serde::{Deserialize, Serialize};
 
 pub struct Database {

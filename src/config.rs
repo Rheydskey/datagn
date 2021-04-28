@@ -2,7 +2,7 @@ use crate::database::Database;
 use crate::database::DatabaseType;
 use crate::DatabasePool;
 
-#[cfg(config_serde)]
+#[cfg(feature = "config_serde")]
 use serde::{Deserialize, Serialize};
 
 #[cfg_attr(feature = "config_serde", derive(Serialize, Deserialize))]
