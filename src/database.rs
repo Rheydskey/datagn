@@ -76,7 +76,7 @@ impl Database {
             ),
             #[cfg(feature = "mssql")]
             DatabaseType::Mssql => DatabasePool::Mssql(
-                sqlx::Mssql::connect(config.mssql_format().as_str())
+                sqlx::MssqlPool::connect(config.mssql_format().as_str())
                     .await
                     .unwrap(),
             ),
