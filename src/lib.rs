@@ -1,5 +1,5 @@
-#[cfg(not(any(feature = "sqlite", feature = "mysql", feature = "postgres",)))]
-compile_error!("one of the features ['sqlite', 'mysql', 'postgres'] must be enabled");
+#[cfg(not(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql")))]
+compile_error!("one of the features ['sqlite', 'mysql', 'postgres', 'mssql'] must be enabled");
 
 pub mod config;
 pub mod database;
@@ -17,7 +17,7 @@ use sqlx::{Postgres, postgres::PgRow};
 #[cfg(feature = "sqlite")]
 use sqlx::{Sqlite,  sqlite::SqliteRow};
 #[cfg(feature = "mssql")]
-use sqlx::{Mssql, sqlx::mssql::MssqlRow};
+use sqlx::{Mssql, mssql::MssqlRow};
 
 #[derive(Clone, Debug)]
 pub enum DatabasePool {
