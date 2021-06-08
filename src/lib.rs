@@ -3,7 +3,6 @@ compile_error!("one of the features ['sqlite', 'mysql', 'postgres', 'mssql'] mus
 
 pub mod config;
 pub mod database;
-pub mod test;
 pub mod utils;
 
 #[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
