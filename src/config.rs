@@ -1,5 +1,7 @@
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
 use crate::database::Database;
 use crate::database::DatabaseType;
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
 use crate::DatabasePool;
 
 #[cfg(feature = "config_serde")]
@@ -15,7 +17,7 @@ pub struct DatabaseConfig {
     pub password: String,
     pub database: Option<String>
 }
-
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
 impl DatabaseConfig {
     pub fn new() -> Self {
         let database_type = match () {

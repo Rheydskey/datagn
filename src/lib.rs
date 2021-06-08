@@ -6,22 +6,18 @@ pub mod database;
 pub mod test;
 pub mod utils;
 
-use crate::utils::sqlstrip;
-
-use sqlx::{any::AnyRow, mysql::MySqlRow, postgres::PgRow, sqlite::SqliteRow, Executor, Pool};
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
+use sqlx::{any::AnyRow, Executor, Pool};
 
 #[cfg(feature = "mysql")]
-use sqlx::MySql;
+use sqlx::{MySql, mysql::MySqlRow};
+
 #[cfg(feature = "postgres")]
-use sqlx::Postgres;
+use sqlx::{Postgres, postgres::PgRow};
 #[cfg(feature = "sqlite")]
-use sqlx::Sqlite;
+use sqlx::{Sqlite,  sqlite::SqliteRow};
 #[cfg(feature = "mssql")]
-use sqlx::Mssql;
-
-
-use std::fmt::Display;
-use sqlx::mssql::MssqlRow;
+use sqlx::{Mssql, sqlx::mssql::MssqlRow};
 
 #[derive(Clone, Debug)]
 pub enum DatabasePool {
@@ -35,10 +31,12 @@ pub enum DatabasePool {
     Mssql(Pool<Mssql>)
 }
 
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
 trait ToAnyRows {
     fn to_anyrows(self) -> Vec<AnyRow>;
 }
 
+#[cfg(feature = "mysql")]
 impl ToAnyRows for Vec<MySqlRow> {
     fn to_anyrows(self) -> Vec<AnyRow> {
         let mut result = Vec::new();
@@ -49,6 +47,7 @@ impl ToAnyRows for Vec<MySqlRow> {
     }
 }
 
+#[cfg(feature = "postgres")]
 impl ToAnyRows for Vec<PgRow> {
     fn to_anyrows(self) -> Vec<AnyRow> {
         let mut result = Vec::new();
@@ -59,6 +58,7 @@ impl ToAnyRows for Vec<PgRow> {
     }
 }
 
+#[cfg(feature = "sqlite")]
 impl ToAnyRows for Vec<SqliteRow> {
     fn to_anyrows(self) -> Vec<AnyRow> {
         let mut result = Vec::new();
@@ -69,6 +69,7 @@ impl ToAnyRows for Vec<SqliteRow> {
     }
 }
 
+#[cfg(feature = "mssql")]
 impl ToAnyRows for Vec<MssqlRow> {
     fn to_anyrows(self) -> Vec<AnyRow> {
         let mut result = Vec::new();
@@ -78,36 +79,48 @@ impl ToAnyRows for Vec<MssqlRow> {
         result
     }
 }
-
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
 trait ToAnyRow {
     fn to_anyrow(self) -> AnyRow;
 }
 
+#[cfg(feature = "mysql")]
 impl ToAnyRow for MySqlRow {
     fn to_anyrow(self) -> AnyRow {
         AnyRow::from(self)
     }
 }
 
+#[cfg(feature = "postgres")]
 impl ToAnyRow for PgRow {
     fn to_anyrow(self) -> AnyRow {
         AnyRow::from(self)
     }
 }
 
+#[cfg(feature = "sqlite")]
 impl ToAnyRow for SqliteRow {
     fn to_anyrow(self) -> AnyRow {
         AnyRow::from(self)
     }
 }
 
+#[cfg(feature = "mssql")]
 impl ToAnyRow for MssqlRow {
     fn to_anyrow(self) -> AnyRow {
         AnyRow::from(self)
     }
 }
 
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
+use std::fmt::Display;
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
+use crate::utils::sqlstrip;
+
+#[cfg(any(feature = "sqlite", feature = "mysql", feature = "postgres", feature = "mssql"))]
 impl DatabasePool {
+
+
     pub async fn execute(&mut self, query: &str) -> Result<(), String> {
         match self {
             #[cfg(feature = "sqlite")]
@@ -254,6 +267,7 @@ impl DatabasePool {
             },
         }
     }
+    
     pub async fn execute_and_fetch_all_with_bind<A: Display>(
         &mut self,
         query: &str,

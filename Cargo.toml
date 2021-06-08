@@ -8,12 +8,12 @@ edition = "2018"
 
 [features]
 
-mysql = []
-postgres = []
-sqlite = []
-mssql = []
+mysql = ["sqlx/mysql"]
+postgres = ["sqlx/postgres"]
+sqlite = ["sqlx/sqlite"]
+mssql = ["sqlx/mssql"]
 
-config_serde = []
+config_serde = ["serde"]
 
 runtime-actix-native-tls = ["sqlx/runtime-actix-native-tls"]
 runtime-async-std-native-tls = ["sqlx/runtime-async-std-native-tls"]
@@ -23,7 +23,6 @@ runtime-async-std-rustls = ["sqlx/runtime-async-std-rustls"]
 runtime-tokio-rustls = ["sqlx/runtime-tokio-rustls"]
 
 [dependencies]
-sqlx = { version = "0.5.2", features = ["all"] }
-async-std = "1.9.0"
+sqlx = { version = "0.5.5", features = ["any"], optional = false}
 logger = {git = "https://github.com/Rheydskey/logger.git", branch = "master"}
-serde = {version = "1.0.125", features = ["derive"]}
+serde = {version = "1.0.125", features = ["derive"], optional = true}
