@@ -1,6 +1,4 @@
 use crate::{config::DatabaseConfig, DatabasePool};
-use logger::error;
-
 
 #[cfg(feature = "config_serde")]
 use serde::{Deserialize, Serialize};
