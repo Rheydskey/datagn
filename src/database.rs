@@ -51,14 +51,7 @@ impl Database {
         match config.database_type {
             #[cfg(feature = "sqlite")]
             DatabaseType::Sqlite => {
-                let e = match sqlx::SqlitePool::connect(config.sqlite_format().as_str()).await {
-                    Ok(e) => e,
-                    Err(e) => {
-                        error(format!("Error : {}", e.as_database_error().unwrap()));
-                        panic!()
-                    }
-                };
-                DatabasePool::Sqlite(e)
+                DatabasePool::Sqlite(sqlx::SqlitePool::connect(config.sqlite_format().as_str()).await.unwrap())
             }
             #[cfg(feature = "mysql")]
             DatabaseType::Mysql => DatabasePool::Mysql(
